@@ -1,0 +1,61 @@
+{
+  "bookSourceComment": "",
+  "bookSourceGroup": "漫画",
+  "bookSourceName": "KissLove",
+  "bookSourceType": 2,
+  "bookSourceUrl": "https://klz9.com",
+  "bookUrlPattern": "https://klz9\\.com/api/manga/slug/.*",
+  "concurrentRate": "10/10000",
+  "customButton": false,
+  "customOrder": 2,
+  "enabled": true,
+  "enabledCookieJar": true,
+  "enabledExplore": true,
+  "eventListener": false,
+  "exploreUrl": "最近更新::https://klz9.com/api/manga?page={{page}}&limit=36\n每日热门::https://klz9.com/api/manga/trending-daily",
+  "header": "<js>JSON.stringify(Object.assign({'User-Agent':'Mozilla/5.0 (Linux; Android 15) AppleWebKit/537.36 Chrome/131.0.0.0 Mobile Safari/537.36','Referer':'https://klz9.com/','Origin':'https://klz9.com','Accept':'application/json'},klSign()))</js>",
+  "jsLib": "var KL_BASE = 'https://klz9.com';\nvar KL_CLIENT_ID = 'KL9K40zaSyC9K40vOMLLbEcepIFBhUKXwELqxlwTEF';\nfunction klSign() {\n  var ts = String(Math.floor(Date.now() / 1000));\n  var text = ts + '.' + KL_CLIENT_ID;\n  var md = Packages.java.security.MessageDigest.getInstance('SHA-256');\n  var input = new Packages.java.lang.String(text).getBytes('UTF-8');\n  var bytes = md.digest(input);\n  var hex = '';\n  for (var i = 0; i < bytes.length; i++) {\n    var v = bytes[i] & 255;\n    hex += (v < 16 ? '0' : '') + v.toString(16);\n  }\n  return {'X-Client-Sig': hex, 'X-Client-Ts': ts};\n}\nfunction klRequest(url) {\n  return url + ',' + JSON.stringify({headers: klSign()});\n}\nfunction klPlain(s) {\n  return String(s == null ? '' : s).replace(/<[^>]*>/g, ' ').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/\\s+/g, ' ').trim();\n}\nfunction klBook(b) {\n  if (!b || !b.slug || !b.name) throw Error('KissLove: missing manga slug/name');\n  var gs = b.genres;\n  var genres = Array.isArray(gs) ? gs.join(', ') : String(gs || '').split(',').join(', ');\n  return {\n    name: b.name,\n    author: b.authors || '',\n    kind: genres + (b.m_status === 1 ? ',完结' : ',连载'),\n    cover: b.cover || '',\n    intro: klPlain(b.description) + (b.other_name ? '\\n\\n' + b.other_name : ''),\n    url: KL_BASE + '/api/manga/slug/' + encodeURIComponent(b.slug),\n    latest: b.last_chapter == null ? '' : 'Chapter ' + b.last_chapter\n  };\n}\nfunction klImages(obj) {\n  var ignore = {\n    'https://1.bp.blogspot.com/-ZMyVQcnjYyE/W2cRdXQb15I/AAAAAAACDnk/8X1Hm7wmhz4hLvpIzTNBHQnhuKu05Qb0gCHMYCw/s0/LHScan.png': 1,\n    'https://s4.imfaclub.com/images/20190814/Credit_LHScan_5d52edc2409e7.jpg': 1,\n    'https://s4.imfaclub.com/images/20200112/5e1ad960d67b2_5e1ad962338c7.jpg': 1\n  };\n  var hosts = {\n    'imfaclub.com': 'j1.jfimv2.xyz',\n    's2.imfaclub.com': 'j2.jfimv2.xyz',\n    's4.imfaclub.com': 'j4.jfimv2.xyz',\n    'ihlv1.xyz': 'j1.jfimv2.xyz',\n    's2.ihlv1.xyz': 'j2.jfimv2.xyz',\n    's4.ihlv1.xyz': 'j4.jfimv2.xyz',\n    'h1.klimv1.xyz': 'j1.jfimv2.xyz',\n    'h2.klimv1.xyz': 'j2.jfimv2.xyz',\n    'h4.klimv1.xyz': 'j4.jfimv2.xyz'\n  };\n  var images = String(obj.content || '').split(/\\r?\\n/);\n  var out = [];\n  for (var i = 0; i < images.length; i++) {\n    var img = images[i].trim();\n    if (!img || ignore[img]) continue;\n    var m = img.match(/^(https?:\\/\\/)([^\\/:?#]+)(.*)$/i);\n    if (m && hosts[m[2].toLowerCase()]) img = m[1] + hosts[m[2].toLowerCase()] + m[3];\n    out.push('<img src=\"' + img.replace(/&/g, '&amp;').replace(/\"/g, '&quot;') + '\">');\n  }\n  return out.join('\\n');\n}",
+  "lastUpdateTime": 0,
+  "respondTime": 30000,
+  "ruleBookInfo": {
+    "author": "author",
+    "coverUrl": "cover",
+    "init": "<js>JSON.stringify(klBook(JSON.parse(result)))</js>",
+    "intro": "intro",
+    "kind": "kind",
+    "lastChapter": "latest",
+    "name": "name",
+    "tocUrl": "url"
+  },
+  "ruleContent": {
+    "content": "<js>klImages(JSON.parse(result))</js>",
+    "imageStyle": "FULL"
+  },
+  "ruleExplore": {
+    "author": "author",
+    "bookList": "<js>var j=JSON.parse(result);var a=(Array.isArray(j)?j:(j.items||[])).map(klBook);java.setContent(JSON.stringify(a));java.getElements(\"@json:$[*]\")</js>",
+    "bookUrl": "url",
+    "coverUrl": "cover",
+    "intro": "intro",
+    "kind": "kind",
+    "lastChapter": "latest",
+    "name": "name"
+  },
+  "ruleSearch": {
+    "author": "author",
+    "bookList": "<js>var j=JSON.parse(result);var a=(j.items||[]).map(klBook);java.setContent(JSON.stringify(a));java.getElements(\"@json:$[*]\")</js>",
+    "bookUrl": "url",
+    "coverUrl": "cover",
+    "intro": "intro",
+    "kind": "kind",
+    "lastChapter": "latest",
+    "name": "name"
+  },
+  "ruleToc": {
+    "chapterList": "<js>var a=JSON.parse(result).chapters||[];a.sort(function(x,y){return Number(x.chapter)-Number(y.chapter)});var list=a.map(function(c){return {name:c.name&&c.name.trim()?c.name:'Chapter '+c.chapter,url:KL_BASE+'/api/chapter/'+c.id}});java.setContent(JSON.stringify(list));java.getElements(\"@json:$[*]\")</js>",
+    "chapterName": "name",
+    "chapterUrl": "url"
+  },
+  "searchUrl": "<js>klRequest(KL_BASE+'/api/manga/list?search='+encodeURIComponent(key)+'&sort=Popular&order=desc&page='+page)</js>",
+  "weight": 0
+}

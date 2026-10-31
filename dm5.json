@@ -1,0 +1,61 @@
+{
+  "bookSourceComment": "",
+  "bookSourceGroup": "漫画",
+  "bookSourceName": "动漫屋",
+  "bookSourceType": 2,
+  "bookSourceUrl": "https://www.dm5.com",
+  "bookUrlPattern": "https?://(?:www\\.)?dm5\\.(?:com|cn)/manhua-.*",
+  "concurrentRate": "",
+  "customButton": false,
+  "customOrder": 1,
+  "enabled": true,
+  "enabledCookieJar": true,
+  "enabledExplore": true,
+  "eventListener": false,
+  "exploreUrl": "最近更新::https://www.dm5.com/manhua-list-s2-p{{page}}/\n热门漫画::https://www.dm5.com/manhua-list-p{{page}}/",
+  "header": "{\"User-Agent\": \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36\", \"Accept-Language\": \"zh-TW\", \"Cookie\": \"isAdult=1\"}",
+  "jsLib": "\nvar DM5_BASE='https://www.dm5.com';\nfunction dm5Doc(html,url){return org.jsoup.Jsoup.parse(String(html),url||DM5_BASE);}\nfunction dm5Abs(url){url=String(url||'');if(/^https?:\\/\\//i.test(url))return url;if(url.indexOf('//')===0)return 'https:'+url;return DM5_BASE+(url.charAt(0)==='/'?'':'/')+url;}\nfunction dm5Bg(e){if(!e)return '';var img=e.selectFirst('img');if(img&&img.hasAttr('src'))return dm5Abs(img.attr('src'));var p=e.selectFirst('p.mh-cover');if(!p)return '';var m=/url\\([\\s\"']*([^\\)\"']+)/.exec(p.attr('style'));return m?dm5Abs(m[1]):'';}\nfunction dm5Entries(doc,search){var nodes=doc.select(search?'ul.mh-list > li, div.banner_detail_form':'ul.mh-list > li > div.mh-item');var list=[];for(var i=0;i<nodes.size();i++){var e=nodes.get(i);var a=e.selectFirst(search?'.title > a':'h2.title > a');if(!a)continue;list.push({name:a.text(),url:dm5Abs(a.attr('href')),cover:dm5Bg(e),author:'',kind:'',intro:'',latest:''});}return list;}\nfunction dm5ListToLegado(data, legadoJava){legadoJava.setContent(JSON.stringify(data));return legadoJava.getElements('@json:$[*]');}\nfunction dm5Var(script,name){var m=new RegExp('\\\\bvar\\\\s+'+name+'\\\\s*=\\\\s*([\\\\s\\\\S]*?);').exec(script);return m?m[1].replace(/^\\s*[\"']|[\"']\\s*$/g,'').trim():'';}\nfunction dm5Radix(s,radix){var n=0;for(var i=0;i<s.length;i++){var c=s.charCodeAt(i),v=c>=48&&c<=57?c-48:c>=97&&c<=122?c-87:c-29;n=n*radix+v;}return n;}\n// One-pass token replacement like Keiyoushi's Unpacker; handles common Dean Edwards Packer layout.\nfunction dm5Unpack(js){var s=String(js);if(/var\\s+pix\\s*=/.test(s))return s;\nvar re=/\\}\\s*\\(\\s*(['\"])((?:\\\\.|(?!\\1)[\\s\\S])*?)\\1\\s*,\\s*(\\d+)\\s*,\\s*(\\d+)\\s*,\\s*(['\"])((?:\\\\.|(?!\\5)[\\s\\S])*?)\\5\\.split\\(\\s*['\"]\\|['\"]\\s*\\)/;\nvar m=re.exec(s);if(!m)throw Error('DM5 Packer arguments not found');\nvar payload=m[2].replace(/\\\\'/g,\"'\").replace(/\\\\\"/g,'\"');var radix=Number(m[3]),words=m[6].split('|');\nreturn payload.replace(/\\w+/g,function(k){var i=dm5Radix(k,radix);return i<words.length&&words[i]?words[i]:k;});}\nfunction dm5GetPage(legadoJava,url,referer){return String(legadoJava.ajax(url+',{\"headers\":{\"Referer\":'+JSON.stringify(referer)+'}}'));}\nfunction dm5ImageFromScript(js){var code=dm5Unpack(js);var pix=/var\\s+pix\\s*=\\s*[\"']([^\"']+)/.exec(code);var pv=/var\\s+pvalue\\s*=\\s*\\[\\s*[\"']([^\"']+)/.exec(code);var suffix=/pix\\s*\\+\\s*pvalue\\s*\\[\\s*i\\s*\\]\\s*\\+\\s*[\"']([^\"']*)/.exec(code);if(!pix||!pv||!suffix)throw Error('DM5 unpacked image URL incomplete');return pix[1]+pv[1]+suffix[1];}\n",
+  "lastUpdateTime": 0,
+  "respondTime": 180000,
+  "ruleBookInfo": {
+    "author": "author",
+    "coverUrl": "cover",
+    "init": "<js>\nvar doc=dm5Doc(result,baseUrl);var root=doc.selectFirst('div.banner_detail_form');if(!root)throw Error('动漫屋未返回书籍详情；可能触发了访问限制');\nvar title=root.selectFirst('p.title');var author=root.selectFirst('p.subtitle > a');var content=root.selectFirst('p.content');var status=root.selectFirst('p.tip > span > span');\nvar bookdata={name:title?title.ownText():'',author:author?author.text():'',cover:(root.selectFirst('img')?dm5Abs(root.selectFirst('img').attr('src')):''),kind:(status?status.text():'')+','+doc.select('div.banner_detail_form p.tip a').eachText().toString(),intro:content?content.text():'',latest:'',url:baseUrl,toc:baseUrl};\nJSON.stringify(bookdata);\n</js>",
+    "intro": "intro",
+    "kind": "kind",
+    "lastChapter": "latest",
+    "name": "name",
+    "tocUrl": "toc"
+  },
+  "ruleContent": {
+    "content": "<js>\nvar doc=dm5Doc(result,baseUrl);var codeEl=doc.selectFirst('script:containsData(DM5_MID)');if(!codeEl)throw Error('DM5_MID not found: blocked page or changed layout');\nvar code=codeEl.data();if(code.indexOf('DM5_VIEWSIGN_DT')<0)throw Error('DM5_VIEWSIGN_DT missing: paid chapter or access restriction');\nvar cid=dm5Var(code,'DM5_CID');var loaded=doc.select('div#barChapter > img.load-src');var images=[];\nif(loaded.size()>0){for(var i=0;i<loaded.size();i++)images.push(dm5Abs(loaded.get(i).attr('data-src')));}\nelse{\nvar mid=dm5Var(code,'DM5_MID'),dt=dm5Var(code,'DM5_VIEWSIGN_DT'),sign=dm5Var(code,'DM5_VIEWSIGN'),count=parseInt(dm5Var(code,'DM5_IMAGE_COUNT'),10);\nif(!cid||!mid||!dt||!sign||!count||count>500)throw Error('DM5 chapter signature/image count invalid');\nvar parent=baseUrl.replace(/[^/]*$/,'');var endpoint=parent+'chapterfun.ashx';\nfor(var p=1;p<=count;p++){\nvar query='?cid='+encodeURIComponent(cid)+'&page='+p+'&key=&language=1&gtk=6&_cid='+encodeURIComponent(cid)+'&_mid='+encodeURIComponent(mid)+'&_dt='+encodeURIComponent(dt)+'&_sign='+encodeURIComponent(sign);\nvar script=dm5GetPage(java,endpoint+query,parent);images.push(dm5ImageFromScript(script));\n}}\nvar output='';for(var ii=0;ii<images.length;ii++){var h=images[ii];if(!/^https?:\\/\\//.test(h))continue;output+='<img src=\"'+h+',{\"headers\":{\"Referer\":\"'+DM5_BASE+'/m'+cid+'\"}}\">\\n';}\nif(!output)throw Error('动漫屋未解析到图片');output;\n</js>",
+    "imageStyle": "FULL"
+  },
+  "ruleExplore": {
+    "author": "author",
+    "bookList": "<js>dm5ListToLegado(dm5Entries(dm5Doc(result,baseUrl),baseUrl.indexOf(\"/search?\")>=0),java)</js>",
+    "bookUrl": "url",
+    "coverUrl": "cover",
+    "intro": "intro",
+    "kind": "kind",
+    "lastChapter": "latest",
+    "name": "name"
+  },
+  "ruleSearch": {
+    "author": "author",
+    "bookList": "<js>dm5ListToLegado(dm5Entries(dm5Doc(result,baseUrl),baseUrl.indexOf(\"/search?\")>=0),java)</js>",
+    "bookUrl": "url",
+    "coverUrl": "cover",
+    "intro": "intro",
+    "kind": "kind",
+    "lastChapter": "latest",
+    "name": "name"
+  },
+  "ruleToc": {
+    "chapterList": "<js>\nvar d=dm5Doc(result,baseUrl);var warn=d.selectFirst('.warning-bar');if(warn)throw Error('动漫屋访问限制：'+warn.text());\nvar container=d.selectFirst('div#chapterlistload');if(!container)throw Error('动漫屋目录缺失，请检查网页访问状态/Cookie/IP 限制');\nvar groups=container.select('> ul');var titles=d.select('.detail-list-title > a.block');var all=[];\nfor(var i=0;i<groups.size();i++){var group=groups.get(i);var as=group.select('li > a');var tag=i<titles.size()?titles.get(i).text().split('（')[0]:'';var tmp=[];\nfor(var k=0;k<as.size();k++){var a=as.get(k);var t=a.selectFirst('p.title');var name=t?t.text():a.text();if(a.selectFirst('.detail-lock, .view-lock'))name='🔒 '+name;tmp.push({name:name,url:dm5Abs(a.attr('href')),tag:tag});}\n// Keiyoushi gives website order; Legado requires chronological order. Reverse each reverse-chronological group.\nif(d.selectFirst('div.detail-list-title a.order')==null||d.selectFirst('div.detail-list-title a.order').text()!=='正序')tmp.reverse();\nfor(var n=0;n<tmp.length;n++)all.push(tmp[n]);}\ndm5ListToLegado(all,java);\n</js>",
+    "chapterName": "name",
+    "chapterUrl": "url"
+  },
+  "searchUrl": "<js>DM5_BASE+\"/search?title=\"+encodeURIComponent(key)+\"&language=1&page=\"+page</js>",
+  "weight": 0
+}
