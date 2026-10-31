@@ -47,3 +47,9 @@ bash tests/run_rhino.sh
 已核验 99csw 上游 README 声明 GPL-3.0-or-later（上游未附完整 LICENSE）；随仓库保存 GPL-3.0 文本并记录归属与修改。具体版本、适配与尚未解决的授权链问题见上游核对记录。
 
 漫画柜本轮使用 Keiyoushi 的 Apache-2.0 代码，完整许可文本保存在 `licenses/Apache-2.0.txt`。LZ Base64 解压直接翻译 Kotlin 到 Rhino JS 并内置在单份书源 jsLib；不再请求远程 lz-string。离线测试覆盖五组官方 lz-string 1.4.4 压缩向量（ASCII、中文/代理对、长重复字符串、隐藏目录及图片字典），以及静态 Packer、隐藏目录与单行本并存、最新章节日期、图片 CDN/Referer 和错误页面。主站 10 次/10 秒、R18 默认 Cookie 和固定元数据保持不变，图片 CDN 独立 4 次/秒限速仍未实现。
+
+## 书源导入页面（GitHub Pages）
+
+访问 [Legado 书源页面](https://raidenii.github.io/legado-md3-sources/)，可单独打开每份书源的 Raw JSON、复制链接，或点击「导入阅读」唤起已安装的客户端。页面与参考站一致使用 `yuedu://booksource/importonline?src=…`；浏览器未唤起客户端时，可复制 Raw URL 到「书源管理 → 网络导入」。导入行为仍需在实际 Android/Legado MD3 上确认。
+
+页面源码为 `docs/index.html`，没有前端构建依赖或外部脚本。GitHub Pages 使用 **Deploy from a branch → master → /docs**，该分支更新后由 GitHub 自动部署。新增/移除根目录书源时，同步更新页面列表及数量；Raw URL 始终指向 master 的独立 JSON 文件。

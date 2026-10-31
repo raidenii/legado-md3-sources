@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="Legado MD3 书源：漫画柜、动漫屋、KissLove、九九藏书网与轻小说文库。提供单独导入、Raw JSON 和链接复制。">
+  <title>Legado 书源 · Raidenii</title>
+  <style>
+    :root { --paper:#f6f5ef; --card:#fffef9; --ink:#203d37; --muted:#64736c; --line:#dcded2; --accent:#28684f; --tint:#e6eee2; --hover:#eef0e6; }
+    * { box-sizing:border-box; }
+    body { margin:0; background:var(--paper); color:var(--ink); font-family:system-ui,-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif; line-height:1.6; }
+    a { color:inherit; text-underline-offset:4px; }
+    button { font:inherit; }
+    a:focus-visible,button:focus-visible { outline:3px solid var(--accent); outline-offset:4px; }
+    .wrap { max-width:1040px; padding:0 32px; margin:auto; }
+    header { display:flex; justify-content:space-between; align-items:center; padding:30px 0; border-bottom:1px solid var(--line); gap:16px; }
+    .brand { font-size:12px; font-weight:700; letter-spacing:.14em; }
+    .brand span { color:var(--muted); font-weight:400; }
+    .repo { font-size:13px; text-decoration:none; white-space:nowrap; }
+    .hero { padding:64px 0 42px; display:flex; justify-content:space-between; align-items:flex-end; gap:24px; }
+    .eyebrow { color:var(--accent); font-size:12px; letter-spacing:.13em; margin:0 0 15px; font-weight:650; }
+    h1 { font-family:"Iowan Old Style","Noto Serif CJK SC","Songti SC",SimSun,serif; font-size:clamp(36px,6vw,58px); line-height:1.25; font-weight:500; letter-spacing:.02em; margin:0 0 18px; }
+    .lead { margin:0; color:var(--muted); font-size:15px; }
+    .edition { flex-shrink:0; border-left:1px solid var(--line); padding-left:22px; font-size:12px; color:var(--muted); }
+    .edition strong { display:block; color:var(--ink); font-size:28px; line-height:1.3; font-weight:450; letter-spacing:.04em; }
+    .instructions { border:1px solid var(--line); border-radius:12px; padding:16px 20px; font-size:13px; color:var(--muted); margin-bottom:36px; }
+    .instructions strong { color:var(--ink); font-weight:600; }
+    .section-title { display:flex; align-items:center; gap:12px; margin-bottom:14px; }
+    h2 { font-size:14px; font-weight:600; margin:0; }
+    .count { color:var(--muted); font-size:12px; }
+    .sources { background:var(--card); border:1px solid var(--line); border-radius:16px; overflow:hidden; }
+    .source { display:flex; align-items:center; gap:20px; padding:25px 24px; }
+    .source+.source { border-top:1px solid var(--line); }
+    .number { font-size:12px; color:var(--muted); font-variant-numeric:tabular-nums; align-self:flex-start; padding-top:7px; }
+    .info { flex:1; min-width:0; }
+    .title-line { display:flex; align-items:center; flex-wrap:wrap; gap:10px; }
+    h3 { margin:0; font-size:18px; font-weight:600; }
+    .tag { font-size:10px; padding:1px 7px; border:1px solid var(--line); border-radius:5px; color:var(--muted); }
+    .domain { margin:5px 0 0; font-size:12px; color:var(--muted); }
+    .actions { display:flex; align-items:center; gap:10px; flex-shrink:0; }
+    .raw,.copy,.import { border-radius:7px; padding:8px 12px; text-decoration:none; font-size:12px; white-space:nowrap; min-height:38px; display:inline-flex; align-items:center; justify-content:center; }
+    .raw,.copy { border:1px solid var(--line); background:transparent; color:var(--ink); }
+    .copy { cursor:pointer; }
+    .copy[hidden] { display:none; }
+    .raw:hover,.copy:hover { background:var(--hover); }
+    .import { border:1px solid var(--accent); background:var(--accent); color:#fff; gap:16px; }
+    .import:hover { filter:brightness(1.12); }
+    .notes { margin:22px 0 0; font-size:12px; color:var(--muted); }
+    footer { margin:46px 0 28px; padding-top:20px; border-top:1px solid var(--line); display:flex; flex-wrap:wrap; justify-content:space-between; gap:12px; font-size:12px; color:var(--muted); }
+    footer a { text-decoration:none; }
+    #copy-status { min-height:24px; margin:10px 0 0; font-size:13px; color:var(--accent); }
+    @media(max-width:740px) {
+      .wrap { padding:0 20px; }
+      .hero { padding:44px 0 28px; }
+      .edition { display:none; }
+      .source { flex-wrap:wrap; gap:12px; padding:20px; }
+      .info { flex-basis:calc(100% - 40px); }
+      .actions { margin-left:0; width:100%; gap:8px; flex-wrap:wrap; }
+      .import { margin-left:auto; }
+      .raw,.copy,.import { padding:9px 10px; }
+      .instructions { padding:14px 16px; margin-bottom:28px; }
+      footer { margin-top:28px; }
+    }
+    @media(prefers-color-scheme:dark) {
+      :root { --paper:#15221e; --card:#1c2c25; --ink:#e4ebdf; --muted:#a4b5a8; --line:#35483b; --accent:#408564; --tint:#273c2d; --hover:#283c30; }
+      .eyebrow,#copy-status { color:#a4cfad; }
+    }
+    @media(prefers-reduced-motion:no-preference) { a,button { transition:background-color .15s; } }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">RAIDENII <span>/ LEGADO SOURCES</span></div>
+      <a class="repo" href="https://github.com/raidenii/legado-md3-sources" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
+    </header>
+    <main>
+      <section class="hero" aria-labelledby="page-title">
+        <div>
+          <p class="eyebrow">阅读 · 书源集</p>
+          <h1 id="page-title">Legado 书源</h1>
+          <p class="lead">选择一份书源，导入 Legado，继续你的阅读。</p>
+        </div>
+        <div class="edition"><strong>05</strong>份独立书源</div>
+      </section>
+      <aside class="instructions">
+        <strong>如何使用</strong>　已安装阅读？点击「导入阅读」。也可复制 Raw 链接，在阅读的「书源管理 → 网络导入」中粘贴。
+      </aside>
+      <div class="section-title"><h2>全部书源</h2><span class="count">3 个漫画源 · 2 个文字源</span></div>
+      <section class="sources" aria-label="可导入的书源">
+        <article class="source">
+          <span class="number" aria-hidden="true">01</span>
+          <div class="info"><div class="title-line"><h3>漫画柜</h3><span class="tag">漫画</span></div><p class="domain">manhuagui.com · manhuagui.json</p></div>
+          <div class="actions">
+            <a class="raw" href="https://raw.githubusercontent.com/raidenii/legado-md3-sources/master/manhuagui.json" target="_blank" rel="noopener noreferrer" aria-label="查看漫画柜 Raw JSON">Raw JSON ↗</a>
+            <button class="copy" type="button" data-file="manhuagui.json" aria-label="复制漫画柜 Raw 链接" hidden>复制链接</button>
+            <a class="import" href="yuedu://booksource/importonline?src=https%3A%2F%2Fraw.githubusercontent.com%2Fraidenii%2Flegado-md3-sources%2Fmaster%2Fmanhuagui.json" aria-label="将漫画柜导入阅读">导入阅读 <span aria-hidden="true">↗</span></a>
+          </div>
+        </article>
+        <article class="source">
+          <span class="number" aria-hidden="true">02</span>
+          <div class="info"><div class="title-line"><h3>动漫屋</h3><span class="tag">漫画</span></div><p class="domain">dm5.com · dm5.json</p></div>
+          <div class="actions">
+            <a class="raw" href="https://raw.githubusercontent.com/raidenii/legado-md3-sources/master/dm5.json" target="_blank" rel="noopener noreferrer" aria-label="查看动漫屋 Raw JSON">Raw JSON ↗</a>
+            <button class="copy" type="button" data-file="dm5.json" aria-label="复制动漫屋 Raw 链接" hidden>复制链接</button>
+            <a class="import" href="yuedu://booksource/importonline?src=https%3A%2F%2Fraw.githubusercontent.com%2Fraidenii%2Flegado-md3-sources%2Fmaster%2Fdm5.json" aria-label="将动漫屋导入阅读">导入阅读 <span aria-hidden="true">↗</span></a>
+          </div>
+        </article>
+        <article class="source">
+          <span class="number" aria-hidden="true">03</span>
+          <div class="info"><div class="title-line"><h3>KissLove</h3><span class="tag">漫画</span></div><p class="domain">klz9.com · kisslove.json</p></div>
+          <div class="actions">
+            <a class="raw" href="https://raw.githubusercontent.com/raidenii/legado-md3-sources/master/kisslove.json" target="_blank" rel="noopener noreferrer" aria-label="查看 KissLove Raw JSON">Raw JSON ↗</a>
+            <button class="copy" type="button" data-file="kisslove.json" aria-label="复制 KissLove Raw 链接" hidden>复制链接</button>
+            <a class="import" href="yuedu://booksource/importonline?src=https%3A%2F%2Fraw.githubusercontent.com%2Fraidenii%2Flegado-md3-sources%2Fmaster%2Fkisslove.json" aria-label="将 KissLove 导入阅读">导入阅读 <span aria-hidden="true">↗</span></a>
+          </div>
+        </article>
+        <article class="source">
+          <span class="number" aria-hidden="true">04</span>
+          <div class="info"><div class="title-line"><h3>九九藏书网</h3><span class="tag">小说 · 文学</span></div><p class="domain">99csw.com · 99csw.json</p></div>
+          <div class="actions">
+            <a class="raw" href="https://raw.githubusercontent.com/raidenii/legado-md3-sources/master/99csw.json" target="_blank" rel="noopener noreferrer" aria-label="查看九九藏书网 Raw JSON">Raw JSON ↗</a>
+            <button class="copy" type="button" data-file="99csw.json" aria-label="复制九九藏书网 Raw 链接" hidden>复制链接</button>
+            <a class="import" href="yuedu://booksource/importonline?src=https%3A%2F%2Fraw.githubusercontent.com%2Fraidenii%2Flegado-md3-sources%2Fmaster%2F99csw.json" aria-label="将九九藏书网导入阅读">导入阅读 <span aria-hidden="true">↗</span></a>
+          </div>
+        </article>
+        <article class="source">
+          <span class="number" aria-hidden="true">05</span>
+          <div class="info"><div class="title-line"><h3>轻小说文库</h3><span class="tag">轻小说</span></div><p class="domain">wenku8.cc · wenku8.json</p></div>
+          <div class="actions">
+            <a class="raw" href="https://raw.githubusercontent.com/raidenii/legado-md3-sources/master/wenku8.json" target="_blank" rel="noopener noreferrer" aria-label="查看轻小说文库 Raw JSON">Raw JSON ↗</a>
+            <button class="copy" type="button" data-file="wenku8.json" aria-label="复制轻小说文库 Raw 链接" hidden>复制链接</button>
+            <a class="import" href="yuedu://booksource/importonline?src=https%3A%2F%2Fraw.githubusercontent.com%2Fraidenii%2Flegado-md3-sources%2Fmaster%2Fwenku8.json" aria-label="将轻小说文库导入阅读">导入阅读 <span aria-hidden="true">↗</span></a>
+          </div>
+        </article>
+      </section>
+      <p id="copy-status" role="status" aria-live="polite"></p>
+      <p class="notes">每份 JSON 均可单独导入。书源使用说明与测试状态请参阅 <a href="https://github.com/raidenii/legado-md3-sources#readme">项目文档</a>。</p>
+    </main>
+    <footer><span>Legado MD3 书源 · Raidenii</span><a href="https://github.com/raidenii/legado-md3-sources/issues">反馈问题 ↗</a></footer>
+  </div>
+  <script>
+    const status = document.getElementById('copy-status');
+    document.querySelectorAll('.copy').forEach(button => {
+      button.hidden = false;
+      button.addEventListener('click', async () => {
+        const url = button.closest('.source').querySelector('.raw').href;
+        try {
+          await navigator.clipboard.writeText(url);
+          status.textContent = '已复制 ' + button.dataset.file + ' 的 Raw 链接。';
+        } catch {
+          status.textContent = '未能自动复制，请长按或右键「Raw JSON」复制链接。';
+        }
+      });
+    });
+  </script>
+</body>
+</html>
