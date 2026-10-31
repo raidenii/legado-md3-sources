@@ -1,0 +1,50 @@
+[
+  {
+    "html": "<html><head><meta name=\"client\" content=\"MEElMkElMQ==\"></head><body><div id=\"content\"><p>Paragraph 0</p><p>Paragraph 1</p><p>Paragraph 2</p></div></body></html>",
+    "expected": "<p>Paragraph 0</p><p>Paragraph 2</p><p>Paragraph 1</p>"
+  },
+  {
+    "html": "<html><head><meta name=\"client\" content=\"MUElMkElMA==\"></head><body><div id=\"content\"><p>Paragraph 0</p><p>Paragraph 1</p><p>Paragraph 2</p></div></body></html>",
+    "expected": "<p>Paragraph 2</p><p>Paragraph 0</p><p>Paragraph 1</p>"
+  },
+  {
+    "html": "<html><head><meta name=\"client\" content=\"MUElMkElMA==\"></head><body><div id=\"content\"><p>Paragraph 0</p><p>Paragraph 1</p><p>Paragraph 2</p></div></body></html>",
+    "expected": "<p>Paragraph 2</p><p>Paragraph 0</p><p>Paragraph 1</p>"
+  },
+  {
+    "html": "<html><head><meta name=\"client\" content=\"MkElNEElMEElMQ==\"></head><body><div id=\"content\"><p>Paragraph 0</p><p>Paragraph 1</p><p>Paragraph 2</p><p>Paragraph 3</p></div></body></html>",
+    "expected": "<p>Paragraph 2</p><p>Paragraph 3</p><p>Paragraph 0</p><p>Paragraph 1</p>"
+  },
+  {
+    "html": "<html><head><meta name=\"client\" content=\"MUElMEElMkElNg==\"></head><body><div id=\"content\"><p>Paragraph 0</p><p>Paragraph 1</p><p>Paragraph 2</p><p>Paragraph 3</p></div></body></html>",
+    "expected": "<p>Paragraph 1</p><p>Paragraph 0</p><p>Paragraph 2</p><p>Paragraph 3</p>"
+  },
+  {
+    "html": "<html><head><meta name=\"client\" content=\"MkElMUElMEElNg==\"></head><body><div id=\"content\"><p>Paragraph 0</p><p>Paragraph 1</p><p>Paragraph 2</p><p>Paragraph 3</p></div></body></html>",
+    "expected": "<p>Paragraph 2</p><p>Paragraph 1</p><p>Paragraph 0</p><p>Paragraph 3</p>"
+  },
+  {
+    "html": "<html><head><meta name=\"client\" content=\"NUElNkElMEElMUElMTNBJTJBJTE1QSUxNA==\"></head><body><div id=\"content\"><p>Paragraph 0</p><p>Paragraph 1</p><p>Paragraph 2</p><p>Paragraph 3</p><p>Paragraph 4</p><p>Paragraph 5</p><p>Paragraph 6</p><p>Paragraph 7</p></div></body></html>",
+    "expected": "<p>Paragraph 2</p><p>Paragraph 3</p><p>Paragraph 5</p><p>Paragraph 7</p><p>Paragraph 1</p><p>Paragraph 0</p><p>Paragraph 6</p><p>Paragraph 4</p>"
+  },
+  {
+    "html": "<html><head><meta name=\"client\" content=\"MUElNEElOEElMEElMTNBJTEyQSUxNkElMg==\"></head><body><div id=\"content\"><p>Paragraph 0</p><p>Paragraph 1</p><p>Paragraph 2</p><p>Paragraph 3</p><p>Paragraph 4</p><p>Paragraph 5</p><p>Paragraph 6</p><p>Paragraph 7</p></div></body></html>",
+    "expected": "<p>Paragraph 3</p><p>Paragraph 0</p><p>Paragraph 7</p><p>Paragraph 1</p><p>Paragraph 5</p><p>Paragraph 2</p><p>Paragraph 6</p><p>Paragraph 4</p>"
+  },
+  {
+    "html": "<html><head><meta name=\"client\" content=\"MUElNUElOEElMTFBJTBBJTExQSUyQSUxOA==\"></head><body><div id=\"content\"><p>Paragraph 0</p><p>Paragraph 1</p><p>Paragraph 2</p><p>Paragraph 3</p><p>Paragraph 4</p><p>Paragraph 5</p><p>Paragraph 6</p><p>Paragraph 7</p></div></body></html>",
+    "expected": "<p>Paragraph 4</p><p>Paragraph 0</p><p>Paragraph 6</p><p>Paragraph 5</p><p>Paragraph 1</p><p>Paragraph 2</p><p>Paragraph 3</p><p>Paragraph 7</p>"
+  },
+  {
+    "html": "<html><head><meta name=\"client\" content=\"OUElOEElMTlBJTEwQSUxOUElMkElMEElMjJBJTI4QSUyOEElMjVBJTFBJTI5QSUyOEElMjhBJTQw\"></head><body><div id=\"content\"><p>Paragraph 0</p><p>Paragraph 1</p><p>Paragraph 2</p><p>Paragraph 3</p><p>Paragraph 4</p><p>Paragraph 5</p><p>Paragraph 6</p><p>Paragraph 7</p><p>Paragraph 8</p><p>Paragraph 9</p><p>Paragraph 10</p><p>Paragraph 11</p><p>Paragraph 12</p><p>Paragraph 13</p><p>Paragraph 14</p><p>Paragraph 15</p></div></body></html>",
+    "expected": "<p>Paragraph 6</p><p>Paragraph 11</p><p>Paragraph 5</p><p>Paragraph 14</p><p>Paragraph 3</p><p>Paragraph 13</p><p>Paragraph 1</p><p>Paragraph 10</p><p>Paragraph 12</p><p>Paragraph 0</p><p>Paragraph 7</p><p>Paragraph 4</p><p>Paragraph 9</p><p>Paragraph 15</p><p>Paragraph 8</p><p>Paragraph 2</p>"
+  },
+  {
+    "html": "<html><head><meta name=\"client\" content=\"MTFBJTZBJTEwQSUxM0ElMTNBJTEzQSUyNEElMjlBJTFBJTBBJTMxQSUzMEElMzBBJTJBJTM0QSU0MQ==\"></head><body><div id=\"content\"><p>Paragraph 0</p><p>Paragraph 1</p><p>Paragraph 2</p><p>Paragraph 3</p><p>Paragraph 4</p><p>Paragraph 5</p><p>Paragraph 6</p><p>Paragraph 7</p><p>Paragraph 8</p><p>Paragraph 9</p><p>Paragraph 10</p><p>Paragraph 11</p><p>Paragraph 12</p><p>Paragraph 13</p><p>Paragraph 14</p><p>Paragraph 15</p></div></body></html>",
+    "expected": "<p>Paragraph 9</p><p>Paragraph 8</p><p>Paragraph 13</p><p>Paragraph 5</p><p>Paragraph 1</p><p>Paragraph 4</p><p>Paragraph 2</p><p>Paragraph 3</p><p>Paragraph 12</p><p>Paragraph 14</p><p>Paragraph 11</p><p>Paragraph 0</p><p>Paragraph 6</p><p>Paragraph 10</p><p>Paragraph 15</p><p>Paragraph 7</p>"
+  },
+  {
+    "html": "<html><head><meta name=\"client\" content=\"MTBBJTE1QSUxOEElOUElMTVBJTIyQSUxQSUyNEElMjNBJTJBJTIzQSUyNkElMEElMzJBJTQwQSUzMQ==\"></head><body><div id=\"content\"><p>Paragraph 0</p><p>Paragraph 1</p><p>Paragraph 2</p><p>Paragraph 3</p><p>Paragraph 4</p><p>Paragraph 5</p><p>Paragraph 6</p><p>Paragraph 7</p><p>Paragraph 8</p><p>Paragraph 9</p><p>Paragraph 10</p><p>Paragraph 11</p><p>Paragraph 12</p><p>Paragraph 13</p><p>Paragraph 14</p><p>Paragraph 15</p></div></body></html>",
+    "expected": "<p>Paragraph 12</p><p>Paragraph 6</p><p>Paragraph 9</p><p>Paragraph 3</p><p>Paragraph 15</p><p>Paragraph 10</p><p>Paragraph 11</p><p>Paragraph 4</p><p>Paragraph 8</p><p>Paragraph 13</p><p>Paragraph 0</p><p>Paragraph 7</p><p>Paragraph 5</p><p>Paragraph 1</p><p>Paragraph 2</p><p>Paragraph 14</p>"
+  }
+]
