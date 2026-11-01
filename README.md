@@ -11,7 +11,7 @@
 | manhuagui.json | 1793463368434 | 核心流程已在 MD3 实测 | 已按 Kotlin 内置 LZ、移除闲置等待 helper、修复目录日期选择器；Rhino/Jsoup 隐藏目录及图片规则离线通过，修正版未做 MD3 实测 |
 | dm5.json | 0 | 无节流版本待 MD3 确认 | rate 为空且无 sleep；静态 Packer 合成回归通过；Rhino java 作用域仍需客户端复核 |
 | kisslove.json | 0 | 核心流程已在 MD3 实测 | API、章节正序和图片转换合成回归通过；10/10000 限速的上游依据待核验 |
-| 99csw.json | 1793463307822 | 真章节排序验证正常 | 已移除浏览器回退、补齐详情解析、修复 Rhino 空密钥 fallback；Rhino/Jsoup 合成 HTML 与 12 组上游 decoder 对照通过，修正版未做 MD3 实测 |
+| 99csw.json | 1793552977231 | 真章节排序验证正常 | 修复 PC/手机详情结构、同页 HTML 保留及目录去重；书号 5472 的真实页面结构回归通过，待 MD3 复测 |
 | wenku8.json | 1793297391562 | 非本次四源维护范围 | 保留并纳入基础校验；自带许可及归属声明需另行核验 |
 
 “交接报告”来自用户提供的历史状态，不是本轮复测结果。现有文件无法仅凭时间戳判定是否就是历史实测版本，不能据此标记为最新或旧版。
@@ -24,7 +24,7 @@
 python3 -m unittest discover -s tests -v
 ```
 
-测试覆盖全部 JSON 的重复键、独立对象结构、基本必需字段和 URL，以及漫画柜固定元数据。Node 编译 38 个脚本块，不执行它们；Legado `{{...}}` 模板在外层语法检查中被替换，模板内容、Rhino 兼容性和动态代码不因此得到验证。识别 `<js>`、`@js:`、jsLib、preUpdateJs 和漫画柜 loginUrl。
+测试覆盖全部 JSON 的重复键、独立对象结构、基本必需字段和 URL，以及漫画柜固定元数据。Node 编译 40 个脚本块，不执行它们；Legado `{{...}}` 模板在外层语法检查中被替换，模板内容、Rhino 兼容性和动态代码不因此得到验证。识别 `<js>`、`@js:`、jsLib、preUpdateJs 和漫画柜 loginUrl。
 
 离线回归执行本地可信函数，使用合成 KissLove API fixture 和最小 Legado API mock，检查章节正序、默认标题、图片域名转换/过滤/转义；DM5 检查静态 Packer 提取及错误路径；99csw 检查重排索引和无效映射。未执行任何网站返回脚本，未请求网站。Rhino 扩展测试另覆盖漫画柜目录/R18/Packer 以及 99csw DOM 正文和水印（均为合成 HTML）。尚缺真实脱敏网站 HTML fixtures，以及所有修正版的客户端回归。
 
@@ -53,3 +53,5 @@ bash tests/run_rhino.sh
 访问 [Legado 书源页面](https://raidenii.github.io/legado-md3-sources/)，可单独打开每份书源的 Raw JSON、复制链接，或点击「导入阅读」唤起已安装的客户端。页面与参考站一致使用 `yuedu://booksource/importonline?src=…`；浏览器未唤起客户端时，可复制 Raw URL 到「书源管理 → 网络导入」。导入行为仍需在实际 Android/Legado MD3 上确认。
 
 页面源码为 `docs/index.html`，没有前端构建依赖或外部脚本。GitHub Pages 使用 **Deploy from a branch → master → /docs**，该分支更新后由 GitHub 自动部署。新增/移除根目录书源时，同步更新页面列表及数量；Raw URL 始终指向 master 的独立 JSON 文件。
+
+99csw 最新修正改用 PC User-Agent，保留详情/目录同页的原始 HTML；兼容 PC 的 `#book_info` 和手机站的 `.binfo`。目录从容器内遍历有效章节链接，去掉手机页重复项，并统一使用 PC 章节 URL。书号 5472 的 PC/手机页面结构都得到 28 个连续、唯一的章节链接。线上单篇《吃在北平》标题与目录匹配、解析得到 72 段文本；未确认整书正文语义/段落顺序，也未进行实际 MD3 导入和阅读复测。

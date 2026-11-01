@@ -9,11 +9,37 @@ var csw = JSON.parse(readFile('99csw.json', 'UTF-8'));
 var baseUrl = 'https://www.99csw.com/book/1/';
 var result = readFile('tests/fixtures/99csw/catalog.html', 'UTF-8');
 assertEqual(typeof csw.ruleBookInfo.init, 'string');
-var info = JSON.parse(eval(body(csw.ruleBookInfo.init)));
-assertEqual([info.n,info.a,info.k,info.c,info.t], ['离线测试书籍','测试作者','测试类别','https://www.99csw.com/images/test.jpg',baseUrl]);
-result = '<html><h2>备用书名</h2><img src="../cover.jpg"></html>';
-info = JSON.parse(eval(body(csw.ruleBookInfo.init)));
-assertEqual([info.n,info.a,info.k,info.c], ['备用书名','未知作者','小說','https://www.99csw.com/book/cover.jpg']);
+// Apply the CSS selector/attribute contract to real Jsoup, without converting HTML to JSON.
+function detailField(rule, html) {
+    var split=rule.lastIndexOf('@');
+    var selector=rule.substring(5,split),attribute=rule.substring(split+1);
+    var elements=org.jsoup.Jsoup.parse(html,baseUrl).select(selector);
+    return String(attribute==='text'?elements.text():elements.attr('abs:'+attribute));
+}
+var original=result;
+assertEqual(eval(body(csw.ruleBookInfo.init)), original);
+assertEqual(detailField(csw.ruleBookInfo.name,result),'离线测试书籍');
+assertEqual(detailField(csw.ruleBookInfo.author,result),'测试作者');
+assertEqual(detailField(csw.ruleBookInfo.kind,result),'测试类别');
+assertEqual(detailField(csw.ruleBookInfo.coverUrl,result),'https://www.99csw.com/images/test.jpg');
+assertEqual(eval(body(csw.ruleBookInfo.tocUrl)),baseUrl);
+for each (var layout in ['pc','mobile']) {
+    baseUrl=(layout==='pc'?'https://www.99csw.com':'https://m.99csw.com')+'/book/5472/index.htm';
+    result=readFile('tests/fixtures/99csw/catalog-5472-'+layout+'.html','UTF-8');
+    var cached=eval(body(csw.ruleBookInfo.init));
+    assertEqual(cached,result); // Same-page catalog still sees the original HTML.
+    assertEqual(detailField(csw.ruleBookInfo.name,cached),'唐鲁孙系列·中国吃');
+    assertEqual(detailField(csw.ruleBookInfo.author,cached),'唐鲁孙');
+    assertEqual(detailField(csw.ruleBookInfo.coverUrl,cached),'https://www.99csw.com/book/cover.pic/cover_5472.jpg');
+    result=cached;
+    var chapters=eval(body(csw.ruleToc.chapterList));
+    assertEqual(chapters.length,28);
+    assertEqual(chapters[0].name,'馋人说馋（序一）');
+    assertEqual(chapters[3].name,'吃在北平');
+    assertEqual(chapters[27].name,'后记');
+    for(var i=0;i<chapters.length;i++) assertEqual(chapters[i].url,'https://www.99csw.com/book/5472/'+(192826+i)+'.htm');
+}
+baseUrl='https://www.99csw.com/book/1/';
 var java = {log:function() {}}; // Any browser/ajax call fails: no such method exists.
 for each (var rule in [csw.ruleSearch, csw.ruleExplore]) {
     result = readFile('tests/fixtures/99csw/list.html','UTF-8');
@@ -44,3 +70,6 @@ try {eval(body(csw.ruleBookInfo.init));} catch(e) {detailsMessage=String(e);}
 assertEqual(detailsMessage.indexOf('书源登录')>=0,true);
 assertEqual(JSON.stringify(csw).indexOf('startBrowserAwait'),-1);
 print('PASS: 12 99csw reordered outputs match pinned upstream Python decoder');
+
+assertEqual(JSON.parse(csw.header)['User-Agent'].indexOf('Mobile'),-1);
+print('PASS: captured 5472 PC/mobile details and 28 ordered, unique canonical chapter links; shared-page HTML preserved');
