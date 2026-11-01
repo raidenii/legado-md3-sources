@@ -17,7 +17,7 @@
 
 Legado/Rhino 适配保留的差异：已有索引去重/范围校验比上游严格，非法映射回退；保留 HTML 转义、换行及水印清理。测试对照验证合法排列，未声称非法输入行为与上游完全相同。
 
-当前 99csw.json SHA-256：`aecada7eae44c7f5d1ce5e3dde495112318021a1c9de2dd3ed13bcbf5a2a18dc`。
+当前 99csw.json SHA-256：`56adaee22b401f983ee6fbc97957e19e5d63f250fd1319d73473aa469d761e26`。
 
 ## 漫画柜
 
@@ -82,3 +82,13 @@ PC UA 修正版后用户反馈认证通过又回到认证。本轮没有设备 C
 因此不能简单归因于“书源与登录窗口一定使用了不同 UA”；已核对版本中两者都会采用书源头。更准确的问题是上一版把设备 WebView 也伪装为固定桌面 Chrome，可能与设备实际浏览器特征不符。现移除该人为变量：header 动态使用 String(java.getWebViewUA())，其余语言/Referer、Cookie Jar 和 www 登录 URL 保留。不向 Cookie 写入凭据，不清空用户 Cookie，不增加浏览器回退、延时或重试。
 
 Rhino 测试用返回 Java String 的 getWebViewUA mock 验证输出 UA 与设备值一致，且无固定 Cookie；已有 PC/移动详情、28 章目录、正文和其他书源回归继续通过。这是 API 契约与解析验证，未执行 Android WebView/Cloudflare，用户当前安装版本是否与核对版本相同也未确认。PC URL 仍作为章节规范地址，移动页面兼容保留。
+
+## 2026-11-01：用户授权的交互式 CF 验证恢复
+
+用户确认真实 WebView UA 版能够过盾，并明确要求搜索/发现/正文撞 CF 时自动弹出验证窗口、正文验证后刷新。因此本版不再沿用前文“只能手动点登录”的策略，AGENTS 中记入该书源的明确授权例外。
+
+本版 jsLib 内置 cswResponseHtml(legadoJava, response, url, stage, selector)，先检查预期数据容器和挑战标记，再至多调用一次 startBrowserAwait(url, title, true)，读取返回 body 后继续解析。调用点覆盖搜索/发现/详情/目录/正文，始终传当前 baseUrl（保留搜索词、分页或章节地址），不把验证地址替换成站点首页。空响应、取消或再遇挑战会停止，不递归弹窗、不额外 java.ajax 或重复请求。正常空列表以及含 Cloudflare 字样的真实正文不会触发。
+
+客户端 API 依据仍为 HapeLee/legado-with-MD3@b21025d3769ec9c4028514914f3c555a1ba284b8：JsExtensions.kt 的三参 startBrowserAwait 把 refetchAfterSuccess 传给 SourceVerificationHelp.getVerificationResult；StrResponse.kt 提供 body() 方法。客户端负责验证窗口、Cookie 保存和验证后的重新获取；书源不执行网页的解包脚本、不添加 CF 识别算法、等待或重试。
+
+Rhino 测试用返回 Java String 的 response.body() mock 覆盖搜索/发现/详情/目录/正文挑战，断言每次只开一次窗口、URL 是原 URL、refetchAfterSuccess=true，刷新内容被正确解析；另验证取消、空响应、重复挑战停止，正常空结果/含 CF 名称的文章不打开窗口。原有正文上游对照、真实目录结构和其他书源回归通过。这些是 API 契约模拟，不宣称已在 MD3 设备上实际弹窗/续读通过。

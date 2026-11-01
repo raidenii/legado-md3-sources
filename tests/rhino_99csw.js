@@ -6,6 +6,7 @@ function assertEqual(actual, expected) {
 }
 function body(code) { return code.replace(/^<js>/, '').replace(/<\/js>$/, ''); }
 var csw = JSON.parse(readFile('99csw.json', 'UTF-8'));
+eval(csw.jsLib);
 var baseUrl = 'https://www.99csw.com/book/1/';
 var result = readFile('tests/fixtures/99csw/catalog.html', 'UTF-8');
 assertEqual(typeof csw.ruleBookInfo.init, 'string');
@@ -51,7 +52,7 @@ for each (var rule in [csw.ruleSearch, csw.ruleExplore]) {
     result = readFile('tests/fixtures/99csw/challenge.html','UTF-8');
     var message = '';
     try { eval(body(rule.bookList)); } catch (error) { message = String(error); }
-    assertEqual(message.indexOf('书源登录') >= 0, true);
+    assertEqual(message.indexOf('startBrowserAwait') >= 0, true);
 }
 result = readFile('tests/fixtures/99csw/chapter.html','UTF-8');
 assertEqual(eval(body(csw.ruleContent.content)), '<p>第一段</p><p>第二段</p><p>第三段</p><p>第四段</p>');
@@ -67,8 +68,8 @@ for each (var decoderCase in decoderCases) {
 result=readFile('tests/fixtures/99csw/challenge.html','UTF-8');
 var detailsMessage='';
 try {eval(body(csw.ruleBookInfo.init));} catch(e) {detailsMessage=String(e);}
-assertEqual(detailsMessage.indexOf('书源登录')>=0,true);
-assertEqual(JSON.stringify(csw).indexOf('startBrowserAwait'),-1);
+assertEqual(detailsMessage.indexOf('startBrowserAwait')>=0,true);
+assertEqual(typeof cswResponseHtml,'function');
 print('PASS: 12 99csw reordered outputs match pinned upstream Python decoder');
 
 // Header uses MD3's WebView API, not an invented desktop/mobile UA or Cookie.
@@ -83,3 +84,52 @@ assertEqual(csw.enabledCookieJar,true);
 assertEqual(csw.loginUrl,'https://www.99csw.com/');
 java=savedJava;
 print('PASS: captured 5472 PC/mobile details and 28 ordered, unique canonical chapter links; shared-page HTML preserved');
+
+// Every challenged stage opens once, requests MD3's post-verification refetch,
+// and parses the returned origin response rather than the challenge HTML.
+var challenge=readFile('tests/fixtures/99csw/challenge.html','UTF-8');
+var refreshed=readFile('tests/fixtures/99csw/list.html','UTF-8');
+var browserCalls=0,stageUrl='https://www.99csw.com/book/search.php?q=test&page=2';
+java={log:function(){},startBrowserAwait:function(url,title,refetch){
+    browserCalls++;
+    assertEqual(url,baseUrl);
+    assertEqual(refetch,true);
+    return {body:function(){return new Packages.java.lang.String(refreshed);}};
+}};
+baseUrl=stageUrl;
+for each(var rule in [csw.ruleSearch,csw.ruleExplore]) {
+    browserCalls=0; result=challenge;
+    assertEqual(eval(body(rule.bookList)).length,1);
+    assertEqual(browserCalls,1);
+}
+baseUrl='https://www.99csw.com/book/5472/index.htm';
+refreshed=readFile('tests/fixtures/99csw/catalog-5472-pc.html','UTF-8');
+browserCalls=0;result=challenge;
+assertEqual(eval(body(csw.ruleBookInfo.init)),refreshed);
+assertEqual(browserCalls,1);
+browserCalls=0;result=challenge;
+assertEqual(eval(body(csw.ruleToc.chapterList)).length,28);
+assertEqual(browserCalls,1);
+baseUrl='https://www.99csw.com/book/1/1.htm';
+refreshed=readFile('tests/fixtures/99csw/chapter.html','UTF-8');
+browserCalls=0;result=challenge;
+assertEqual(eval(body(csw.ruleContent.content)),'<p>第一段</p><p>第二段</p><p>第三段</p><p>第四段</p>');
+assertEqual(browserCalls,1);
+// A second challenge, an empty response or cancellation never starts a browser loop.
+for each(var bad in [challenge,'']) {
+    refreshed=bad;browserCalls=0;result=challenge;
+    var failed=false;
+    try{eval(body(csw.ruleContent.content));}catch(error){failed=true;}
+    assertEqual(failed,true);assertEqual(browserCalls,1);
+}
+java.startBrowserAwait=function(){browserCalls++;throw Error('User cancelled');};
+browserCalls=0;result=challenge;
+var cancelled='';try{eval(body(csw.ruleContent.content));}catch(error){cancelled=String(error);}
+assertEqual(cancelled.indexOf('User cancelled')>=0,true);assertEqual(browserCalls,1);
+// No browser for normal empty search results or an article mentioning Cloudflare.
+baseUrl=stageUrl;result='<ul class="list_box"></ul>';browserCalls=0;
+assertEqual(eval(body(csw.ruleSearch.bookList)),[]);assertEqual(browserCalls,0);
+result='<div id="content"><p>Cloudflare is mentioned in this article.</p></div>';
+assertEqual(eval(body(csw.ruleContent.content)),'<p>Cloudflare is mentioned in this article.</p>');
+assertEqual(browserCalls,0);
+print('PASS: all-stage one-shot CF browser/refetch, cancellation, repeated challenge and no-challenge paths');
