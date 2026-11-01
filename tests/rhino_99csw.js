@@ -71,5 +71,15 @@ assertEqual(detailsMessage.indexOf('书源登录')>=0,true);
 assertEqual(JSON.stringify(csw).indexOf('startBrowserAwait'),-1);
 print('PASS: 12 99csw reordered outputs match pinned upstream Python decoder');
 
-assertEqual(JSON.parse(csw.header)['User-Agent'].indexOf('Mobile'),-1);
+// Header uses MD3's WebView API, not an invented desktop/mobile UA or Cookie.
+var savedJava=java;
+var deviceUA='Mozilla/5.0 (Linux; Android 15; Test Device; wv) AppleWebKit/537.36 Version/4.0 Chrome/140.0.0.0 Mobile Safari/537.36';
+java={getWebViewUA:function(){return new Packages.java.lang.String(deviceUA);}};
+var sourceHeaders=JSON.parse(eval(body(csw.header)));
+assertEqual(sourceHeaders['User-Agent'],deviceUA);
+assertEqual(sourceHeaders['Referer'],'https://www.99csw.com/index.php');
+assertEqual(typeof sourceHeaders.Cookie,'undefined');
+assertEqual(csw.enabledCookieJar,true);
+assertEqual(csw.loginUrl,'https://www.99csw.com/');
+java=savedJava;
 print('PASS: captured 5472 PC/mobile details and 28 ordered, unique canonical chapter links; shared-page HTML preserved');

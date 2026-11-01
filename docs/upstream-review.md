@@ -17,7 +17,7 @@
 
 Legado/Rhino 适配保留的差异：已有索引去重/范围校验比上游严格，非法映射回退；保留 HTML 转义、换行及水印清理。测试对照验证合法排列，未声称非法输入行为与上游完全相同。
 
-当前 99csw.json SHA-256：`d3ff2252001eee0c089768b0fcc96d4711d708d9445c21b49f28859913dff706`。
+当前 99csw.json SHA-256：`aecada7eae44c7f5d1ce5e3dde495112318021a1c9de2dd3ed13bcbf5a2a18dc`。
 
 ## 漫画柜
 
@@ -67,3 +67,18 @@ fixtures/catalog-5472-pc.html 和 catalog-5472-mobile.html 来自上述公开页
 从目录得到 /book/5472/192829.htm，实际 PC 页和 #content h2 均为《吃在北平》。在 Rhino 中执行现有静态正文解析得到 72 段、9980 字符。此检查仅确认一篇响应的身份和可提取性，不能据此确认整书内容、所有段落语义顺序或设备上的阅读行为。完整正文只留在 /tmp 检查，未提交。
 
 原有 12 组上游重排对照及其他书源测试通过；当前仍需用户更新书源后在 MD3 中复测详情、完整目录与实际正文。
+
+## 2026-11-01：CF 循环反馈后的 UA 修正
+
+PC UA 修正版后用户反馈认证通过又回到认证。本轮没有设备 Cookie、网络身份或 WebView 指纹，因此不能证明具体 CF 原因，也不能宣称已修好认证。
+
+核对 [HapeLee/legado-with-MD3@b21025d3769ec9c4028514914f3c555a1ba284b8](https://github.com/HapeLee/legado-with-MD3/tree/b21025d3769ec9c4028514914f3c555a1ba284b8)：
+
+- app/src/main/java/io/legado/app/help/JsExtensions.kt：getWebViewUA() 返回 WebSettings.getDefaultUserAgent(appCtx)。
+- app/src/main/java/io/legado/app/data/entities/BaseSource.kt：getHeaderMap 支持 <js> header，缺少 UA 时才使用全局设置；有登录 header 时可继续合并覆盖。
+- app/src/main/java/io/legado/app/ui/login/SourceLoginSheets.kt：登录 WebView 的 userAgentString 取 state.headers 中的 User-Agent。
+- app/src/main/java/io/legado/app/ui/login/SourceLoginViewModel.kt：登录流程从 WebView CookieManager 保存 Cookie 到 CookieStore。
+
+因此不能简单归因于“书源与登录窗口一定使用了不同 UA”；已核对版本中两者都会采用书源头。更准确的问题是上一版把设备 WebView 也伪装为固定桌面 Chrome，可能与设备实际浏览器特征不符。现移除该人为变量：header 动态使用 String(java.getWebViewUA())，其余语言/Referer、Cookie Jar 和 www 登录 URL 保留。不向 Cookie 写入凭据，不清空用户 Cookie，不增加浏览器回退、延时或重试。
+
+Rhino 测试用返回 Java String 的 getWebViewUA mock 验证输出 UA 与设备值一致，且无固定 Cookie；已有 PC/移动详情、28 章目录、正文和其他书源回归继续通过。这是 API 契约与解析验证，未执行 Android WebView/Cloudflare，用户当前安装版本是否与核对版本相同也未确认。PC URL 仍作为章节规范地址，移动页面兼容保留。
